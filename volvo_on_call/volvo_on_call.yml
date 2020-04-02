@@ -1,0 +1,431 @@
+apiVersion: influxdata.com/v2alpha1
+kind: Label
+metadata:
+  name: great_edison_9d7005
+spec:
+  color: "#326BBA"
+  name: inputs.exec
+---
+apiVersion: influxdata.com/v2alpha1
+kind: Label
+metadata:
+  name: nifty_agnesi_9d7001
+spec:
+  color: "#108174"
+  name: outputs.influxdb_v2
+---
+apiVersion: influxdata.com/v2alpha1
+kind: Label
+metadata:
+  name: vigorous_bardeen_9d7003
+spec:
+  color: "#003173"
+  name: Volvo On Call
+---
+apiVersion: influxdata.com/v2alpha1
+kind: Bucket
+metadata:
+  name: distracted_kalam_9d7007
+spec:
+  name: volvooncall
+---
+apiVersion: influxdata.com/v2alpha1
+kind: Variable
+metadata:
+  name: rusty_feynman_dd7001
+spec:
+  language: flux
+  name: registration_number
+  query: |
+    from(bucket: "volvooncall")
+      |> range(start: -7d)
+      |> keep(columns: ["registration_number"])
+      |> rename(columns: {registration_number: "_value"})
+      |> unique()
+  type: query
+---
+apiVersion: influxdata.com/v2alpha1
+kind: Dashboard
+metadata:
+  name: blissful_almeida_dd7001
+spec:
+  associations:
+    - kind: Label
+      name: vigorous_bardeen_9d7003
+  charts:
+    - colors:
+        - hex: "#00C9FF"
+          name: laser
+          type: min
+        - hex: "#9394FF"
+          name: comet
+          type: max
+          value: 100
+      decimalPlaces: 1
+      height: 6
+      kind: Gauge
+      name: Average speed [km/h]
+      queries:
+        - query: |-
+            from(bucket: "volvooncall")
+              |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+              |> filter(fn: (r) => r._measurement == "volvooncall")
+              |> filter(fn: (r) => r._field == "averageSpeed")
+              |> filter(fn: (r) => r.registration_number == v.registration_number)
+              |> last()
+      suffix: " km/h"
+      width: 3
+    - axes:
+        - base: "10"
+          name: x
+          scale: linear
+        - base: "10"
+          name: y
+          scale: linear
+      colors:
+        - hex: "#31C0F6"
+          name: Nineteen Eighty Four
+          type: scale
+        - hex: "#A500A5"
+          name: Nineteen Eighty Four
+          type: scale
+        - hex: "#FF7E27"
+          name: Nineteen Eighty Four
+          type: scale
+      geom: line
+      height: 3
+      kind: Xy
+      name: Daily travel [km]
+      position: overlaid
+      queries:
+        - query: |-
+            from(bucket: "volvooncall")
+              |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+              |> filter(fn: (r) => r._measurement == "volvooncall")
+              |> filter(fn: (r) => r._field == "tripMeter1")
+              |> filter(fn: (r) => r.registration_number == v.registration_number)
+              |> derivative(unit: 1d)
+              |> aggregateWindow(every: 1d, fn: mean, createEmpty: false)
+      shade: true
+      width: 3
+      yPos: 6
+    - colors:
+        - hex: "#DC4E58"
+          name: fire
+          type: background
+        - hex: "#4ED8A0"
+          name: rainforest
+          type: background
+          value: 1
+      decimalPlaces: 0
+      height: 2
+      kind: Single_Stat
+      name: "Doors closed:"
+      prefix: "Doors closed:"
+      queries:
+        - query: |-
+            from(bucket: "volvooncall")
+              |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+              |> filter(fn: (r) => r._measurement == "volvooncall")
+              |> filter(fn: (r) => r._field == "any_door_open")
+              |> filter(fn: (r) => r.registration_number == v.registration_number)
+              |> last()
+              |> map(fn: (r) => ({ r with _value: if r._value then 0 else 1, __textvalue: if r._value then "Open" else "Closed" }))
+      width: 2
+      xPos: 3
+    - colors:
+        - hex: "#DC4E58"
+          name: fire
+          type: background
+        - hex: "#4ED8A0"
+          name: rainforest
+          type: background
+          value: 1
+      decimalPlaces: 0
+      height: 2
+      kind: Single_Stat
+      name: "Washer fluid:"
+      prefix: "Washer fluid ok: "
+      queries:
+        - query: |-
+            from(bucket: "volvooncall")
+              |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+              |> filter(fn: (r) => r._measurement == "volvooncall")
+              |> filter(fn: (r) => r._field == "washerFluidLevel")
+              |> filter(fn: (r) => r.registration_number == v.registration_number)
+              |> last()
+              |> map(fn: (r) => ({ r with _value: if r._value then 0 else 1, __textvalue: if r._value then "Change" else "OK" }))
+      width: 2
+      xPos: 3
+      yPos: 2
+    - axes:
+        - base: "10"
+          name: y
+          scale: linear
+        - base: "10"
+          name: x
+          scale: linear
+      colors:
+        - hex: "#8F8AF4"
+          name: Do Androids Dream of Electric Sheep?
+          type: scale
+        - hex: "#A51414"
+          name: Do Androids Dream of Electric Sheep?
+          type: scale
+        - hex: "#F4CF31"
+          name: Do Androids Dream of Electric Sheep?
+          type: scale
+      geom: line
+      height: 5
+      kind: Xy
+      name: Odometer [km]
+      position: overlaid
+      queries:
+        - query: |-
+            from(bucket: "volvooncall")
+              |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+              |> filter(fn: (r) => r._measurement == "volvooncall")
+              |> filter(fn: (r) => r._field == "odometer")
+              |> filter(fn: (r) => r.registration_number == v.registration_number)
+      shade: true
+      width: 3
+      xPos: 3
+      yPos: 4
+    - colors:
+        - hex: "#DC4E58"
+          name: fire
+          type: background
+        - hex: "#4ED8A0"
+          name: rainforest
+          type: background
+          value: 1
+      decimalPlaces: 0
+      height: 2
+      kind: Single_Stat
+      name: Windows closed
+      prefix: "Windows closed: "
+      queries:
+        - query: |-
+            from(bucket: "volvooncall")
+              |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+              |> filter(fn: (r) => r._measurement == "volvooncall")
+              |> filter(fn: (r) => r._field == "any_window_open")
+              |> filter(fn: (r) => r.registration_number == v.registration_number)
+              |> last()
+              |> map(fn: (r) => ({ r with _value: if r._value then 0 else 1, __textvalue: if r._value then "Open" else "Closed" }))
+      width: 2
+      xPos: 5
+    - colors:
+        - hex: "#DC4E58"
+          name: fire
+          type: background
+        - hex: "#4ED8A0"
+          name: rainforest
+          type: background
+          value: 1
+      decimalPlaces: 0
+      height: 2
+      kind: Single_Stat
+      name: "Brake fluid:"
+      prefix: "Brake fluid ok: "
+      queries:
+        - query: |-
+            from(bucket: "volvooncall")
+              |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+              |> filter(fn: (r) => r._measurement == "volvooncall")
+              |> filter(fn: (r) => r._field == "brakeFluid")
+              |> filter(fn: (r) => r.registration_number == v.registration_number)
+              |> last()
+              |> map(fn: (r) => ({ r with _value: if r._value then 0 else 1, __textvalue: if r._value then "Change" else "OK" }))
+      width: 2
+      xPos: 5
+      yPos: 2
+    - axes:
+        - base: "10"
+          name: x
+          scale: linear
+        - base: "10"
+          name: y
+          scale: linear
+      colors:
+        - hex: "#FDC44F"
+          name: Cthulhu
+          type: scale
+        - hex: "#007C76"
+          name: Cthulhu
+          type: scale
+        - hex: "#8983FF"
+          name: Cthulhu
+          type: scale
+      geom: line
+      height: 5
+      kind: Xy
+      name: Fuel consumption [l / 100km]
+      position: overlaid
+      queries:
+        - query: |-
+            from(bucket: "volvooncall")
+              |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+              |> filter(fn: (r) => r._measurement == "volvooncall")
+              |> filter(fn: (r) => r._field == "averageFuelConsumption")
+              |> filter(fn: (r) => r.registration_number == v.registration_number)
+      shade: true
+      width: 3
+      xPos: 6
+      yPos: 4
+    - colors:
+        - hex: "#DC4E58"
+          name: fire
+          type: background
+        - hex: "#4ED8A0"
+          name: rainforest
+          type: background
+          value: 1
+      decimalPlaces: 0
+      height: 2
+      kind: Single_Stat
+      name: "Locked:"
+      prefix: "Locked: "
+      queries:
+        - query: |-
+            from(bucket: "volvooncall")
+              |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+              |> filter(fn: (r) => r._measurement == "volvooncall")
+              |> filter(fn: (r) => r._field == "is_locked")
+              |> filter(fn: (r) => r.registration_number == v.registration_number)
+              |> last()
+              |> map(fn: (r) => ({ r with _value: if r._value then 1 else 0, __textvalue: if r._value then "Locked" else "Unlocked" }))
+      width: 2
+      xPos: 7
+    - colors:
+        - hex: "#DC4E58"
+          name: fire
+          type: background
+        - hex: "#4ED8A0"
+          name: rainforest
+          type: background
+          value: 1
+      decimalPlaces: 0
+      height: 2
+      kind: Single_Stat
+      name: "Bulbs:"
+      prefix: "Bulbs ok: "
+      queries:
+        - query: |-
+            from(bucket: "volvooncall")
+              |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+              |> filter(fn: (r) => r._measurement == "volvooncall")
+              |> filter(fn: (r) => r._field == "bulbFailures")
+              |> filter(fn: (r) => r.registration_number == v.registration_number)
+              |> last()
+              |> map(fn: (r) => ({ r with _value: if r._value then 0 else 1, __textvalue: if r._value then "Change" else "OK" }))
+      width: 2
+      xPos: 7
+      yPos: 2
+    - colors:
+        - hex: "#BF3D5E"
+          name: ruby
+          type: min
+        - hex: "#DC4E58"
+          name: fire
+          type: threshold
+          value: 10
+        - hex: "#FFD255"
+          name: thunder
+          type: threshold
+          value: 20
+        - hex: "#7CE490"
+          name: honeydew
+          type: threshold
+          value: 50
+        - hex: "#32B08C"
+          name: viridian
+          type: max
+          value: 100
+      decimalPlaces: 0
+      height: 7
+      kind: Gauge
+      name: Fuel amount [%]
+      queries:
+        - query: |-
+            from(bucket: "volvooncall")
+              |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+              |> filter(fn: (r) => r._measurement == "volvooncall")
+              |> filter(fn: (r) => r._field == "fuelAmountLevel")
+              |> filter(fn: (r) => r.registration_number == v.registration_number)
+              |> last()
+      suffix: " %"
+      width: 3
+      xPos: 9
+    - colors:
+        - hex: "#DC4E58"
+          name: fire
+          type: text
+        - hex: "#4ED8A0"
+          name: rainforest
+          type: text
+          value: 50
+      decimalPlaces: 0
+      height: 2
+      kind: Single_Stat
+      name: Distance to empty [km]
+      prefix: "Distance: "
+      queries:
+        - query: |-
+            from(bucket: "volvooncall")
+              |> range(start: v.timeRangeStart, stop: v.timeRangeStop)
+              |> filter(fn: (r) => r._measurement == "volvooncall")
+              |> filter(fn: (r) => r._field == "distanceToEmpty")
+              |> filter(fn: (r) => r.registration_number == v.registration_number)
+              |> last()
+      suffix: " km"
+      width: 3
+      xPos: 9
+      yPos: 7
+  description: ""
+  name: Volvo On Call
+---
+apiVersion: influxdata.com/v2alpha1
+kind: Telegraf
+metadata:
+  name: rustic_shamir_dd7009
+spec:
+  associations:
+    - kind: Label
+      name: nifty_agnesi_9d7001
+    - kind: Label
+      name: vigorous_bardeen_9d7003
+    - kind: Label
+      name: great_edison_9d7005
+  config: |
+    # Telegraf Configuration
+    [agent]
+      interval = "10m"
+      flush_interval = "10m"
+      round_interval = true
+      metric_buffer_limit = 10000
+      collection_jitter = "0s"
+      flush_jitter = "0s"
+      precision = ""
+      debug = true
+      quiet = false
+      logfile = ""
+      omit_hostname = true
+
+    [[outputs.influxdb_v2]]
+      ## Multiple URLs can be specified for a single cluster, only ONE of the
+      ## urls will be written to each interval.
+      ##   ex: urls = ["https://us-west-2-1.aws.cloud2.influxdata.com"]
+      urls = ["$INFLUX_URL"]
+      ## Token for authentication.
+      token = "$INFLUX_TOKEN"
+      ## Organization is the name of the organization you wish to write to; must exist.
+      organization = "$INFLUX_ORG" ## Destination bucket to write into.
+      bucket = "volvooncall"
+
+    [[inputs.exec]]
+      commands = [ "$HOME/volvooncall-retrieve.py" ]
+      timeout = "60s"
+      data_format = "influx"
+  description: Telegraf configuration that invokes volvooncall-retrieve.py script
+  name: Volvo On Call Data Retrieval

@@ -20,6 +20,7 @@ Start by reading [how to use a template](docs/use_a_template.md), then check eac
 | [Linux System Monitor](linux_system/) | Monitor system resources on one or more Linux hosts. | Russ Savage |
 | [Windows System Monitor](windows_system/) | Monitor system resources on one or more Windows hosts. | Russ Savage |
 | [Telegraf Dashboard](telegraf/) | View throughput and internal stats about your Telegraf instances | Steven Soroka |
+| [Volvo On Call](volvo_on_call/) | Monitor metrics and statistics for your Volvo car | Wojciech Kocjan |
 
 
 To submit a new template, see our [contributing guide](docs/submit_a_template.md).
